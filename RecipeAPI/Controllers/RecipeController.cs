@@ -20,14 +20,21 @@ namespace RecipeAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Recipe([FromBody]Recipe r) 
+        public IActionResult Recipe([FromBody]RecipeView r) 
         {
             if (ModelState.IsValid)
             {
-                if (_recipe.AddRecipe(r))
+                //automapper
+                var recipe = new Recipe { 
+                    Name = r.Name,
+                    Description = r.Description,
+                    Tags = r.Tags
+                };
+
+                if (_recipe.AddRecipe(recipe))
                 {
-                    var uri = "https://" +HttpContext.Request.Host + "api/Recipe" +"?id/"+r.Id;
-                    return Created(uri, r);
+                    var uri =  Url.Link("RecipeById",new { recipe.Id});
+                    return Created(uri, recipe);
                 }
                 else
                 {
@@ -42,15 +49,24 @@ namespace RecipeAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Recipe()
+        public IActionResult Recipe([FromQuery]string tag)
         {
-            var recipes = _recipe.GetAllRecipes();
+            IEnumerable<Recipe> recipes;
+            if (!string.IsNullOrEmpty(tag))
+            {
+                recipes = _recipe.GetRecipeByTag(tag);
+            }
+            else
+            {
+                recipes = _recipe.GetAllRecipes();
+            }
+            
             return Ok(recipes);
         }
 
         [HttpGet]
-        [Route("api/[controller]/{id}")]
-        public IActionResult Recipe(int id)
+        [Route("{id:int}", Name="RecipeByID")]
+        public IActionResult RecipeById(int id)
         {
             var recipe = _recipe.GetRecipeById(id);
             if (recipe != null)
@@ -60,16 +76,26 @@ namespace RecipeAPI.Controllers
             return NotFound();
         }
 
-        [HttpGet("{tag}")]
-        public IActionResult Recipe(string tag)
+        [HttpDelete]
+        [Route ("{id:int}")]
+        public IActionResult DeleteRecipe(int id)
         {
-            var recipe = _recipe.GetRecipeByTag(tag);
-            if (recipe != null)
-            {
-                return Ok(recipe);
-            }
-            return NotFound();
+            _recipe.DeleteRecipe(id);
+            return NoContent();
         }
 
+        [HttpPatch]
+        //[Route("{id:int}")]
+        public IActionResult UpdateRecipe(Recipe r)
+        {
+            if (ModelState.IsValid)
+            {
+                if (_recipe.UpdateRecipe(r) == true)
+                {
+                    return Ok();
+                }       
+            }
+            return BadRequest();
+        }
     }
 }

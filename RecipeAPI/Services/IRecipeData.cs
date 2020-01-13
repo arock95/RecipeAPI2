@@ -14,5 +14,7 @@ namespace RecipeAPI.Services
         Recipe GetRecipeById(int id);
 
         IEnumerable<Recipe> GetRecipeByTag(string tag);
+        bool DeleteRecipe(int id);
+        bool UpdateRecipe(Recipe recipe);
     }
 }

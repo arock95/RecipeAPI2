@@ -19,10 +19,12 @@ namespace RecipeAPI.Services
             try
             {
                 _recipe.Recipes.Add(recipe);
-                foreach (Tag t in recipe.Tags)
+                var tags = recipe.Tags.Split(',');
+                foreach (string t in tags)
                 {
-                    if (_recipe.Tags.FirstOrDefault(tag => tag.Name == t.Name)==null){ _recipe.Tags.Add(new Tag { Name = t.Name }); }
+                    if (_recipe.Tags.FirstOrDefault(tag => tag.Name == t)==null){ _recipe.Tags.Add(new Tag { Name = t }); }
                 }
+                SaveChanges();
                 return true;
             }
             catch
@@ -43,8 +45,41 @@ namespace RecipeAPI.Services
 
         public IEnumerable<Recipe> GetRecipeByTag(string tag)
         {
-            //return _recipe.Recipes.Where(r => r.Tags.Contains(tag));
-            throw new NotImplementedException();
+            //this needs fixed, will return sub-strings
+            var new_tag = ", " + tag + ",";
+            return _recipe.Recipes.Where(r => r.Tags.Contains(new_tag));
+        }
+
+        public int SaveChanges()
+        {
+            return _recipe.SaveChanges();
+        }
+
+        public bool DeleteRecipe(int id)
+        {
+            var deletedRecipe = _recipe.Recipes.FirstOrDefault(r => r.Id == id);
+            if (deletedRecipe != null)
+            {
+                _recipe.Recipes.Remove(deletedRecipe);
+                SaveChanges();
+            }
+            return true;
+        }
+
+        public bool UpdateRecipe(Recipe recipe)
+        {
+            var updatedRecipe = _recipe.Recipes.FirstOrDefault(r => r.Id == recipe.Id);
+            if (updatedRecipe != null)
+            {
+                updatedRecipe.Name = recipe.Name;
+                updatedRecipe.Description = recipe.Description;
+                updatedRecipe.Tags = recipe.Tags;
+                _recipe.Recipes.Update(updatedRecipe);
+                SaveChanges();
+                return true;
+            }
+            else { return false; }
+            
         }
     }
 }
