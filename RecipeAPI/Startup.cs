@@ -37,6 +37,10 @@ namespace RecipeAPI
             })
             .AddEntityFrameworkStores<RecipeDbContext>();
 
+            services.AddAuthentication()
+                .AddCookie()
+                .AddJwtBearer();
+
             services.AddControllers();
             services.AddDbContext<RecipeDbContext>(opt => {
                 opt.UseSqlServer(Configuration.GetConnectionString("Local"));

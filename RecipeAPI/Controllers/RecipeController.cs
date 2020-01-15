@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RecipeAPI.Models;
 using RecipeAPI.Services;
@@ -8,6 +9,7 @@ namespace RecipeAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme)]
     public class RecipeController : ControllerBase
     {
         private readonly IRecipeData _recipe;
@@ -16,7 +18,6 @@ namespace RecipeAPI.Controllers
             _recipe = recipe;
         }
 
-        [Authorize]
         [HttpPost]
         public IActionResult Recipe([FromBody]RecipeView r)
         {
@@ -48,6 +49,7 @@ namespace RecipeAPI.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Recipe([FromQuery]string tag)
         {
             IEnumerable<Recipe> recipes;
@@ -64,6 +66,7 @@ namespace RecipeAPI.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("{id:int}", Name = "RecipeByID")]
         public IActionResult RecipeById(int id)
         {
@@ -75,7 +78,6 @@ namespace RecipeAPI.Controllers
             return NotFound();
         }
 
-        [Authorize]
         [HttpDelete]
         [Route("{id:int}")]
         public IActionResult DeleteRecipe(int id)
@@ -84,7 +86,6 @@ namespace RecipeAPI.Controllers
             return NoContent();
         }
 
-        [Authorize]
         [HttpPatch]
         //[Route("{id:int}")]
         public IActionResult UpdateRecipe(Recipe r)
