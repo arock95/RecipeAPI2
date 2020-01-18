@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RecipeAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RecipeAPI.Services
 {
-    public class RecipeDbContext:DbContext
+    public class RecipeDbContext:IdentityDbContext<RecipeUser>
     {
         public RecipeDbContext(DbContextOptions<RecipeDbContext> options): base(options)
         { }
