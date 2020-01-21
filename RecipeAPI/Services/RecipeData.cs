@@ -9,9 +9,11 @@ namespace RecipeAPI.Services
     public class RecipeData : IRecipeData
     {
         private readonly RecipeDbContext _recipe;
-        public RecipeData(RecipeDbContext recipe)
+        private readonly ITagData _tags;
+        public RecipeData(RecipeDbContext recipe, ITagData tags)
         {
             _recipe = recipe;
+            _tags = tags;
         }
 
         public bool AddRecipe(Recipe recipe)
@@ -46,9 +48,8 @@ namespace RecipeAPI.Services
 
         public Tag GetRecipeByTag(string tag)
         {
-            //return _recipe.Recipes.Include(rt => rt.RecipeTags).ThenInclude(r => r.Recipe).ToArray();
-            return _recipe.Tags.Include(rt => rt.RecipeTags)
-                .ThenInclude(r => r.Recipe)
+            return _recipe.Tags
+                .Include(rt => rt.RecipeTags).ThenInclude(r => r.Recipe)
                 .FirstOrDefault(t => t.Name.Contains(tag));
         }
 
@@ -68,14 +69,26 @@ namespace RecipeAPI.Services
             return true;
         }
 
-        public bool UpdateRecipe(Recipe recipe)
+        public bool UpdateRecipe(RecipeView recipe)
         {
-            var updatedRecipe = _recipe.Recipes.FirstOrDefault(r => r.Id == recipe.Id);
+            var updatedRecipe = GetRecipeById(recipe.Id);
             if (updatedRecipe != null)
             {
                 updatedRecipe.Name = recipe.Name;
                 updatedRecipe.Description = recipe.Description;
-                //update recipes at some point
+                updatedRecipe.RecipeTags.RemoveAll(r => r.RecipeId == recipe.Id);
+                SaveChanges();
+                //update tags at some point
+                foreach (string t in recipe.Tags)
+                {
+                    var result = _tags.FindTag(t);
+                    if (result == null)
+                    {
+                        result = _tags.AddTag(t);
+                    }
+                    //add the 'join' between recipe and tag
+                    _recipe.Add(new RecipeTag { RecipeId = recipe.Id, TagId = result.Id });
+                }
                 _recipe.Recipes.Update(updatedRecipe);
                 SaveChanges();
                 return true;

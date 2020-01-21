@@ -51,16 +51,8 @@ namespace RecipeAPI.Controllers
                         _context.SaveChanges();
                     }
                     var uri = Url.Link("RecipeById", new { recipe.Id });
-                    //RecipeView rv = new RecipeView {
-                    //    Id = recipe.Id,
-                    //    Name = recipe.Name,
-                    //    Description = recipe.Description
-                    //};
+
                     RecipeView rv = RecipeToView(recipe);
-                    //foreach (RecipeTag rt in recipe.RecipeTags)
-                    //{
-                    //    rv.Tags.Add(rt.Tag.Name);
-                    //}
                     return Created(uri, rv);
                 }
                 else
@@ -95,18 +87,7 @@ namespace RecipeAPI.Controllers
                 var result = _recipe.GetAllRecipes().ToList();
                 foreach (Recipe r in result)
                 {
-                    //var temp = new RecipeView
-                    //{
-                    //    Id = r.Id,
-                    //    Name = r.Name,
-                    //    Description = r.Description
-                    //};
                     var temp = RecipeToView(r);
-
-                    //foreach (RecipeTag rt in r.RecipeTags)
-                    //{
-                    //    temp.Tags.Add(rt.Tag.Name);
-                    //}
                     recipes.Add(temp);
                 }
             }
@@ -122,19 +103,7 @@ namespace RecipeAPI.Controllers
             var recipe = _recipe.GetRecipeById(id);
             if (recipe != null)
             {
-                //RecipeView rv = new RecipeView
-                //{
-                //    Id = recipe.Id,
-                //    Name = recipe.Name,
-                //    Description = recipe.Description
-                //};
                 RecipeView rv = RecipeToView(recipe);
-
-                //foreach (RecipeTag rt in recipe.RecipeTags)
-                //{
-                //    rv.Tags.Add(rt.Tag.Name);
-                //}
-
                 return Ok(rv);
             }
             return NotFound();
@@ -150,7 +119,7 @@ namespace RecipeAPI.Controllers
 
         [HttpPatch]
         //[Route("{id:int}")]
-        public IActionResult UpdateRecipe(Recipe r)
+        public IActionResult UpdateRecipe([FromBody]RecipeView r)
         {
             if (ModelState.IsValid)
             {
