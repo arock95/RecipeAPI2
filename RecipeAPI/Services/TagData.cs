@@ -14,6 +14,18 @@ namespace RecipeAPI.Services
             _tags = tags;
         }
 
+        public Tag AddTag(string tag)
+        {
+            _tags.Tags.Add(new Tag { Name = tag });
+            _tags.SaveChanges();
+            return FindTag(tag);
+        }
+
+        public Tag FindTag(string tag)
+        {
+            return _tags.Tags.FirstOrDefault(t => t.Name == tag);
+        }
+
         public IEnumerable<Tag> GetAllTags()
         {
             return _tags.Tags.ToArray();

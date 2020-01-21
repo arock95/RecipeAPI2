@@ -14,5 +14,12 @@ namespace RecipeAPI.Services
         { }
         public DbSet<Recipe> Recipes { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<RecipeTag> RecipeTags { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            builder.Entity<RecipeTag>().HasKey(s => new { s.RecipeId, s.TagId });
+        }
     }
 }

@@ -1,8 +1,8 @@
-﻿using RecipeAPI.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using RecipeAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace RecipeAPI.Services
 {
@@ -19,11 +19,6 @@ namespace RecipeAPI.Services
             try
             {
                 _recipe.Recipes.Add(recipe);
-                var tags = recipe.Tags.Split(',');
-                foreach (string t in tags)
-                {
-                    if (_recipe.Tags.FirstOrDefault(tag => tag.Name == t)==null){ _recipe.Tags.Add(new Tag { Name = t }); }
-                }
                 SaveChanges();
                 return true;
             }
@@ -35,19 +30,26 @@ namespace RecipeAPI.Services
 
         public IEnumerable<Recipe> GetAllRecipes()
         {
-            return _recipe.Recipes.ToArray();
+            return _recipe.Recipes
+                .Include(rt => rt.RecipeTags).ThenInclude(r => r.Recipe)
+                .Include(rt => rt.RecipeTags).ThenInclude(t => t.Tag);
         }
 
         public Recipe GetRecipeById(int id)
         {
-            return _recipe.Recipes.FirstOrDefault(r => r.Id == id);
+            return _recipe.Recipes
+                .Include(rt => rt.RecipeTags).ThenInclude(r => r.Recipe)
+                .Include(rt => rt.RecipeTags).ThenInclude(t => t.Tag)
+                .FirstOrDefault(r => r.Id == id);
+
         }
 
-        public IEnumerable<Recipe> GetRecipeByTag(string tag)
+        public Tag GetRecipeByTag(string tag)
         {
-            //this needs fixed, will return sub-strings
-            var new_tag = ", " + tag + ",";
-            return _recipe.Recipes.Where(r => r.Tags.Contains(new_tag));
+            //return _recipe.Recipes.Include(rt => rt.RecipeTags).ThenInclude(r => r.Recipe).ToArray();
+            return _recipe.Tags.Include(rt => rt.RecipeTags)
+                .ThenInclude(r => r.Recipe)
+                .FirstOrDefault(t => t.Name.Contains(tag));
         }
 
         public int SaveChanges()
@@ -73,13 +75,13 @@ namespace RecipeAPI.Services
             {
                 updatedRecipe.Name = recipe.Name;
                 updatedRecipe.Description = recipe.Description;
-                updatedRecipe.Tags = recipe.Tags;
+                //update recipes at some point
                 _recipe.Recipes.Update(updatedRecipe);
                 SaveChanges();
                 return true;
             }
             else { return false; }
-            
+
         }
     }
 }
