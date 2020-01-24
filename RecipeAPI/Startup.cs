@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using RecipeAPI.Models;
 using RecipeAPI.Services;
 using System.Text;
+using Microsoft.OpenApi.Models;
 
 namespace RecipeAPI
 {
@@ -52,6 +53,10 @@ namespace RecipeAPI
             });
             services.AddScoped<IRecipeData, RecipeData>();
             services.AddScoped<ITagData, TagData>();
+
+            services.AddSwaggerGen(cfg => {
+                cfg.SwaggerDoc("v1", new OpenApiInfo {Title = "RecipeAPI", Version="v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,8 +67,14 @@ namespace RecipeAPI
                 app.UseDeveloperExceptionPage();
             }
 
+
             app.UseHttpsRedirection();
             app.UseAuthentication();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(cfg => {
+                cfg.SwaggerEndpoint("/swagger/v1/swagger.json", "RecipeAPI V1");
+            });
 
             app.UseRouting();
             app.UseAuthorization();
