@@ -1,21 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using RecipeAPI.Models;
 using RecipeAPI.Services;
+using System.Text;
 
 namespace RecipeAPI
 {
@@ -31,7 +24,8 @@ namespace RecipeAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddIdentity<RecipeUser, IdentityRole>(cfg => {
+            services.AddIdentity<RecipeUser, IdentityRole>(cfg =>
+            {
                 cfg.User.RequireUniqueEmail = true;
                 cfg.Password.RequireNonAlphanumeric = false;
                 cfg.Password.RequireUppercase = false;
@@ -41,7 +35,8 @@ namespace RecipeAPI
 
             services.AddAuthentication()
                 .AddCookie()
-                .AddJwtBearer(cfg => {
+                .AddJwtBearer(cfg =>
+                {
                     cfg.TokenValidationParameters = new TokenValidationParameters()
                     {
                         ValidIssuer = Configuration["Tokens:Issuer"],
@@ -51,7 +46,8 @@ namespace RecipeAPI
                 });
 
             services.AddControllers();
-            services.AddDbContext<RecipeDbContext>(opt => {
+            services.AddDbContext<RecipeDbContext>(opt =>
+            {
                 opt.UseSqlServer(Configuration.GetConnectionString("Local"));
             });
             services.AddScoped<IRecipeData, RecipeData>();
@@ -68,7 +64,7 @@ namespace RecipeAPI
 
             app.UseHttpsRedirection();
             app.UseAuthentication();
-            
+
             app.UseRouting();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
