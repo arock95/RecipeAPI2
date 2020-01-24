@@ -1,8 +1,5 @@
 ﻿using RecipeAPI.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace RecipeAPI.Services
 {
@@ -13,8 +10,8 @@ namespace RecipeAPI.Services
 
         Recipe GetRecipeById(int id);
 
-        IEnumerable<Recipe> GetRecipeByTag(string tag);
+        Tag GetRecipeByTag(string tag);
         bool DeleteRecipe(int id);
-        bool UpdateRecipe(Recipe recipe);
+        bool UpdateRecipe(RecipeView recipe);
     }
 }

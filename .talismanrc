@@ -1,0 +1,6 @@
+fileignoreconfig:
+- filename: .sonarqube/out/0/output-cs/metrics.pb
+  checksum: 0e3d242b87544b70d7eb7ee9d03190148848ebff9fbe81ecda74531a1c4500e8
+  ignore_detectors: []
+scopeconfig: []
+
