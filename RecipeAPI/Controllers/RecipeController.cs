@@ -24,6 +24,7 @@ namespace RecipeAPI.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult Recipe([FromBody]RecipeView r)
         {
             if (ModelState.IsValid)
