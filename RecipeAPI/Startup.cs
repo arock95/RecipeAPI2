@@ -54,6 +54,14 @@ namespace RecipeAPI
             services.AddScoped<IRecipeData, RecipeData>();
             services.AddScoped<ITagData, TagData>();
 
+            services.AddCors(options=>{
+                options.AddPolicy("WideOpen", builder =>{
+                    builder.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin();
+                });
+            });
+
             services.AddSwaggerGen(cfg => {
                 cfg.SwaggerDoc("v1", new OpenApiInfo {Title = "RecipeAPI", Version="v1" });
             });
@@ -77,6 +85,7 @@ namespace RecipeAPI
             });
 
             app.UseRouting();
+            app.UseCors("WideOpen");
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
